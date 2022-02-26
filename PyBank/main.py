@@ -1,101 +1,62 @@
-from itertools import count
+
+
 import os
 import csv
-from statistics import mean
 
+# Variables
+months = []
+p = []
+average_change = 0
+total_months = 0
+net_change = []
+
+# Load csv file
 csvpath = os.path.join('Resources', 'budget_data.csv')
 
-# with open(csvpath) as csvfile:
-    
-#     csvreader = csv.reader(csvfile, delimiter = ",")
-
-#     print(csvreader)
-
-#     csv_header = next(csvreader)
-
-#     print(f"CSV Header: {csv_header}")
-
-#     # Read each row of data after the header
-#     for row in csvreader:
-#         print(row)
-
-print ("----------------------------")
-
-count = 0
 with open(csvpath) as csvfile:
-    
-    csvreader = csv.reader(csvfile, delimiter = ",")
-    next(csvreader)
-    for row in csvreader:
-        count = count + 1
-    print(f'total months: {int(count)}')
+    csvreader = csv.reader(csvfile, delimiter=",")
+    reader = csv.reader(csvfile)
+    next(reader, None)
+# Add values to lists
+    for row in reader:
+        month = row[0]
+        months.append(month)
+        values = int(row[1])
+        p.append(values)
 
-print ("----------------------------")
+total_months = len(months)
+net_total = sum(p)
+net_total_months = len(months) - 1
+difference_budget_data = []
 
-total = 0
-with open(csvpath) as csvfile:
-    
-    csvreader = csv.reader(csvfile, delimiter = ",")
-    next(csvreader)
-    for row in csvreader:
-        total = total + int(row[1])
-    
-    print(f'Total: {total}')
+for i in range(len(p) - 1):
+    difference_budget_data.append(float(p[i + 1]) - float(p[i]))
+    new_net_total = sum(difference_budget_data)
 
-print ("----------------------------")
-# # Month-to-month changes
-# with open(csvpath) as csvfile:
-#     csvreader = csv.reader(csvfile, delimiter = ",")
-#     next(csvreader)
+# Find the sum of profits/losses
+average_change = new_net_total/net_total_months
 
-#     first_row = next(csvreader)
-#     prev_row = int(first_row[1])
-#     net_change = 0
+# Find the greatest increase/decrease (date and amount) over the entire period
+min_p = p[p.index(min(p))] - p[p.index(min(p))-1]
+max_p = p[p.index(max(p))] - p[p.index(max(p))-1]
 
-#     for row in csvreader:
-#         net_change = int(row[1]) - prev_row
-#         prev_row = int(row[1])
-#         print(net_change)
+# Print out results to console
+print("Financial Analysis")
+print("--------------------")
+print(f"Total Months: {total_months}")
+print(f"Total: ${net_total}")
+print(f"Average Change: ${round(average_change,2)}")
+print(f'Greatest Increase in Profits: {months[p.index(max(p))]} (${max_p})')
+print(f"Greatest Descrease in Profits: {months[p.index(min(p))]} (${min_p})")
 
-
-
-
-
-# Average of monthly changes over the entire period goes here
-
-print ("----------------------------")
-# Greatest profit
-with open(csvpath) as csvfile:
-
-    csvreader = csv.reader(csvfile, delimiter = ",")
-    next(csvreader)
-
-    first_row = next(csvreader)
-    prev_row = int(first_row[1])
-    net_change = 0
-    max_1 = 0
-
-    for row in csvreader:
-        number = int(row[1])
-        if(max_1 < number):
-            max_1 = number
-    print(f'Greatest increse in profit {max_1}')
-
-print ("----------------------------")
-# greatest loss
-with open(csvpath) as csvfile:
-
-    csvreader = csv.reader(csvfile, delimiter = ",")
-    next(csvreader)
-
-    first_row = next(csvreader)
-    prev_row = int(first_row[1])
-    net_change = 0
-    min_1 = 0
-
-    for row in csvreader:
-        number = int(row[1])
-        if(min_1 > number):
-            min_1 = number
-    print(f'Greatest decrese in profit {min_1}')
-    
+# Create a text file with the results
+output_file = 'Analysis/financial_analysis.txt'
+with open(output_file, "w", newline="") as datafile:
+    csvwriter = csv.writer(datafile)
+    csvwriter.writerow(["Financial Analysis"])
+    csvwriter.writerow(["--------------------"])
+    csvwriter.writerow([f"Total Months: {total_months}"])
+    csvwriter.writerow([f"Total: ${net_total}"])
+    csvwriter.writerow([f"Average Change: ${round(average_change,2)}"])
+    csvwriter.writerow([f'Greatest Increase in Profits: {months[p.index(max(p))]} (${max_p})'])
+    csvwriter.writerow([f"Greatest Decrease in Profits: {months[p.index(min(p))]} (${min_p})"])
